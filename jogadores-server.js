@@ -80,3 +80,16 @@ app.get('/Jogadores/valor_mercado', function(req, res){
     });
 
 })
+app.put('/Jogadores', function(req, res){ //mudando o nome do jogador
+
+	var jogador = req.body //ele vai pegar o json
+	var jogadorDic_nome = {Name : jogador.Name}; //pegando no json
+
+	dbo.collection('Jogadores').updateOne(jogadorDic_nome, {$set : jogador}, function(err, result){
+        if(err) throw console.log(err)
+        res.status(200)
+       	res.send("Os dados do jogador foram alterados com sucesso !")
+
+    })
+
+})
