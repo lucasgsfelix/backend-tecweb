@@ -80,7 +80,7 @@ app.get('/Jogadores/valor_mercado', function(req, res){
     });
 
 })
-app.put('/Jogadores', function(req, res){ //mudando o nome do jogador
+app.put('/Jogadores', function(req, res){ //mudando jogador
 
 	var jogador = req.body //ele vai pegar o json
 	var jogadorDic_nome = {Name : jogador.Name}; //pegando no json
@@ -93,3 +93,34 @@ app.put('/Jogadores', function(req, res){ //mudando o nome do jogador
     })
 
 })
+
+app.post('/Jogadores', function(req, res) { //adicionando jogadores no banco de dados
+    var jogador = req.body;
+
+    dbo.collection('Jogadores').insertOne(jogador, function(err, result) {
+        if (err) throw console.log(err);
+
+        res.status(200);
+        res.send('Jogador adicionado com sucesso!');
+    });
+});
+
+app.delete('/Jogadores/nome', function(req, res) { //deleta um jogador
+
+    var nomeJogador = req.query.eq;
+    var id = {Name : nomeJogador};
+
+    dbo.collection('Jogadores').deleteOne(id,function(err, result) { //deleta apenas um jogador
+       res.status(204);
+       res.send('Jogador removido com sucesso!');
+    });
+});
+
+app.delete('/Jogadores', function(req, res) {  // deleta todos jogadores
+
+	
+    dbo.collection('Jogadores').deleteMany({},function(err, result) {
+        res.status(204);
+        res.send('Jogadores removidos com sucesso!');
+    });
+});
