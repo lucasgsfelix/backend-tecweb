@@ -68,7 +68,58 @@ app.get('/Jogadores/idade', function(req, res){
         res.send(JSON.stringify(x)); //estou retornando o jogador
     });
 })
+//retornando jogadores pela nacionalidade
+app.get('/Jogadores/nacionalidade', function(req, res){
 
+    var nacionalidade = req.query.eq
+    var nacionalidade = {"Birth Place": nacionalidade}
+
+    dbo.collection('Jogadores').find(nacionalidade).toArray(function(err, x) {
+        res.setHeader('Content-Type','application/json');
+        res.status(200);
+        res.send(JSON.stringify(x)); //estou retornando o jogador
+    });
+})
+app.get('/Times/Selecao', function(req, res){
+
+    var consultas = req.query.eq
+    var nacionalidade = {"Birth Place": consultas[0]}
+    var valorMercado = consultas[1]
+       
+    dbo.collection('Jogadores').find(nacionalidade).toArray(function(err, x) {
+        if(err) return console.log(err)
+
+        dbo.collection('Jogadores').find( {"Market Value 0" : {$gte: parseInt(valorMercado)} } ).toArray(function(err, x) {
+            res.setHeader('Content-Type','application/json');
+            res.status(200);
+            res.send(JSON.stringify(x)); //estou retornando o jogador
+        });
+    });  
+})
+
+app.get('/Times/Mundo', function(req, res){ // retorna os melhores de acordo com as posições passadas pelo usuário
+
+    //var posicao = ['GK', 'ST', 'RW', 'CF', 'LW', 'CAM', 'CM', 'CDM', 'LM', 'RM', 'CB', 'RB', 'RWB', 'LB', 'RB']
+    var formacao = ['GK', 'LB', 'RB', 'CB', 'CB', 'LW', 'RW', 'CF', 'CF', 'CM', 'CM']
+    var jogadores = []
+    for(var i in formacao){
+
+        var jogador = (dbo.collection('Jogadores').find({"Preferred Positions": formacao[i]}).sort({"Market Value 0":-1}).limit(1).toArray(function(err, jogador){
+            if(err) return console.log(err)
+
+            //res.setHeader('Content-Type','application/json');
+            res.status(200);
+            if(jogador.length>0){
+                res.write(JSON.stringify(jogador)); //estou retornando o jogador
+                return jogador[0].Name.toString()
+            }
+           
+        }))
+        jogadores.push(jogador) //assim eu verifico se o jogador não esta aqui antes de retornar        
+    }
+})
+
+//retornando pelo valor de mercado
 app.get('/Jogadores/valor_mercado', function(req, res){
 
 	var valorMercado = req.query.eq;
