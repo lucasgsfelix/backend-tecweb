@@ -33,8 +33,9 @@ app.get('/Jogadores', function(req, res) { //retorna os jogadores em nosso banco
 app.get('/Jogadores/nome', function(req, res){
 
 	var nomeJogador = req.query.eq; //fazendo a pesquisa pelo nome do jogador
+    nomeJogador = nomeJogador.replace("_", " ")
     var jogador = {Name : nomeJogador}; //cria um "dicionario" com o campo Name: "Requisição", assim ele pesquisa no banco
- 
+    
    	dbo.collection('Jogadores').find(jogador).toArray(function(err, x) {
         res.setHeader('Content-Type','application/json');
         res.status(200);
@@ -48,7 +49,10 @@ app.get('/Jogadores/preco', function(req, res){
 	var precoJogador =  req.query.eq
 	//var precoJogador = {Price : parseInt(precoJogador)}
 	//$gt -- greater than
-	dbo.collection('Jogadores').find( {Price : {$gte: parseInt(precoJogador)} } ).toArray(function(err, x) {
+    //acessando valores do dicionário console.log(x[0]["Market Value 0"])
+    console.log(precoJogador)
+	dbo.collection('Jogadores').find( {"Market Value 0" : {$gte: parseInt(precoJogador)} } ).toArray(function(err, x) {
+        
         res.setHeader('Content-Type','application/json');
         res.status(200);
         res.send(JSON.stringify(x)); //estou retornando o jogador
@@ -91,7 +95,7 @@ app.get('/Times/Nacional', function(req, res){
         selecionados = []
         for(var i=0;i<jogadores.length;i++){
 
-            if(jogadores[i].Birth_Place == consultas[0]){
+            if(jogadores[i]["Birth Place"] == consultas[0]){
                 selecionados.push(jogadores[i])
             }
         }
@@ -114,14 +118,14 @@ app.get('/Times/Selecao', function(req, res){
         //res.setHeader('Content-Type','application/json');
         jogadores.sort(function(a, b){
             
-            return a.Preferred_Positions - b.Preferred_Positions
+            return a["Preferred Positions"] - b["Preferred Positions"]
         })
         jogadoresSelecionados = []
         for(var j in formacao){
             
             for(var i=0;i<jogadores.length;i++){
 
-                if((jogadores[i].Preferred_Positions == formacao[j]) && (jogadoresSelecionados.includes(jogadores[i]) == false)){
+                if((jogadores[i]["Preferred Positions"] == formacao[j]) && (jogadoresSelecionados.includes(jogadores[i]) == false)){
                     jogadoresSelecionados.push(jogadores[i]); //estou retornando o jogador
                     break
                 }
