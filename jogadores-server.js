@@ -156,7 +156,29 @@ app.get('/Times/Mundo', function(req, res){ // retorna os melhores de acordo com
         jogadores.push(jogador) //assim eu verifico se o jogador não esta aqui antes de retornar        
     }
 })
+app.get('/Edicao', function(req, res){ //retornando por edicao do fifa
 
+    var edicao = req.query.eq
+    edicao = edicao.replace("_", " ")
+
+    dbo.collection('Jogadores').find( {"Game Edition" : edicao} ).toArray(function(err, x) {
+        res.setHeader('Content-Type','application/json');
+        res.status(200);
+        res.send(JSON.stringify(x)); //estou retornando o jogador
+    });
+})
+
+app.get('/valor/edicao', function(req, res){ //retornando por edição e por valor
+
+    var edicao = req.query.eq
+    edicao = edicao.replace("_", " ")
+
+    dbo.collection('Jogadores').find( {"Game Edition" : edicao} ).sort({"Market Value 0":-1}).toArray(function(err, x) {
+        res.setHeader('Content-Type','application/json');
+        res.status(200);
+        res.send(JSON.stringify(x)); //estou retornando o jogador
+    });
+})
 //retornando pelo valor de mercado
 app.get('/Jogadores/valor_mercado', function(req, res){
 
