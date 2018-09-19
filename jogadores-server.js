@@ -80,21 +80,59 @@ app.get('/Jogadores/nacionalidade', function(req, res){
         res.send(JSON.stringify(x)); //estou retornando o jogador
     });
 })
-app.get('/Times/Selecao', function(req, res){
+app.get('/Times/Nacional', function(req, res){
 
     var consultas = req.query.eq
     var nacionalidade = {"Birth Place": consultas[0]}
     var valorMercado = consultas[1]
        
-    dbo.collection('Jogadores').find(nacionalidade).toArray(function(err, x) {
-        if(err) return console.log(err)
+    dbo.collection('Jogadores').find( {"Market Value 0" : {$gte: parseInt(valorMercado)} } ).toArray(function(err, jogadores) {
+        
+        selecionados = []
+        for(var i=0;i<jogadores.length;i++){
 
-        dbo.collection('Jogadores').find( {"Market Value 0" : {$gte: parseInt(valorMercado)} } ).toArray(function(err, x) {
-            res.setHeader('Content-Type','application/json');
-            res.status(200);
-            res.send(JSON.stringify(x)); //estou retornando o jogador
-        });
+            if(jogadores[i].Birth_Place == consultas[0]){
+                selecionados.push(jogadores[i])
+            }
+        }
+        res.setHeader('Content-Type','application/json');
+        res.status(200);
+        res.send(JSON.stringify(selecionados)); //estou retornando o jogador
+    
+    });
+
+})
+app.get('/Times/Selecao', function(req, res){
+    //selecionar os jogadores mais caros por posição de um determinado país
+    var nacionalidade = req.query.eq
+    var nacionalidade = {"Birth Place": nacionalidade}
+    var formacao = ['GK', 'GK', 'LB', 'RB', 'CB', 'CB', 'LW', 'RW', 'CF', 'CF', 'CM', 'CM']
+
+    dbo.collection('Jogadores').find(nacionalidade).toArray(function(err, jogadores) {
+        
+
+        //res.setHeader('Content-Type','application/json');
+        jogadores.sort(function(a, b){
+            
+            return a.Preferred_Positions - b.Preferred_Positions
+        })
+        jogadoresSelecionados = []
+        for(var j in formacao){
+            
+            for(var i=0;i<jogadores.length;i++){
+
+                if((jogadores[i].Preferred_Positions == formacao[j]) && (jogadoresSelecionados.includes(jogadores[i]) == false)){
+                    jogadoresSelecionados.push(jogadores[i]); //estou retornando o jogador
+                    break
+                }
+            } //aqui adicionei todos de uma posição desejada */
+        }
+        res.setHeader('Content-Type','application/json');
+        res.status(200);
+        res.send(JSON.stringify(jogadoresSelecionados)); //estou retornando o jogador
+        
     });  
+
 })
 
 app.get('/Times/Mundo', function(req, res){ // retorna os melhores de acordo com as posições passadas pelo usuário
