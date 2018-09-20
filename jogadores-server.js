@@ -50,7 +50,6 @@ app.get('/Jogadores/preco', function(req, res){
 	//var precoJogador = {Price : parseInt(precoJogador)}
 	//$gt -- greater than
     //acessando valores do dicionário console.log(x[0]["Market Value 0"])
-    console.log(precoJogador)
 	dbo.collection('Jogadores').find( {"Market Value 0" : {$gte: parseInt(precoJogador)} } ).toArray(function(err, x) {
         
         res.setHeader('Content-Type','application/json');
@@ -195,19 +194,39 @@ app.get('/Jogadores/valor_mercado', function(req, res){
     });
 
 })
+
 app.put('/Jogadores', function(req, res){ //mudando jogador
 
-	var jogador = req.body //ele vai pegar o json
-	var jogadorDic_nome = {Name : jogador.Name}; //pegando no json
 
-	dbo.collection('Jogadores').updateOne(jogadorDic_nome, {$set : jogador}, function(err, result){
+    var jogador = req.body //ele vai pegar o json
+    var jogadorDic_nome = {Name : jogador.Name}; //pegando no json
+    
+    dbo.collection('Jogadores').updateOne(jogadorDic_nome, {$set : jogador}, function(err, result){
         if(err) throw console.log(err)
         res.status(200)
-       	res.send("Os dados do jogador foram alterados com sucesso !")
+        res.send("Os dados do jogador foram alterados com sucesso !")
 
     })
 
 })
+app.put('/Jogadores/nome', function(req, res){ //mudando jogador
+
+    var jogadorOriginal = req.query.eq
+    jogadorOriginal = {Name : jogadorOriginal.replace('_', ' ')}
+
+    var jogador = req.body //ele vai pegar o json
+    var jogadorDic_nome = {Name : jogador.Name}; //pegando no json
+
+    dbo.collection('Jogadores').updateOne(jogadorOriginal, {$set : jogadorDic_nome}, function(err, result){
+        if(err) throw console.log(err)
+        res.status(200)
+        res.send("Os dados do jogador foram alterados com sucesso !")
+
+    })
+
+})
+
+
 
 app.post('/Jogadores', function(req, res) { //adicionando jogadores no banco de dados
     var jogador = req.body;
